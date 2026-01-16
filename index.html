@@ -1,22 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Jarvishneonopenai – Basic Web Development Programme</title>
-  <style>
-    body{margin:0;font-family:Arial;background:black;color:#0ff}
-    .hidden{display:none}
-    .center{display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
-    h1{font-size:40px;text-shadow:0 0 15px cyan}
-    input,button,textarea{padding:10px;margin:8px;border-radius:5px;border:none}
-    button{background:#0ff;color:black;cursor:pointer;font-weight:bold}
-    #topBar{display:flex;justify-content:space-between;align-items:center;padding:10px}
-    #camera{width:120px;height:80px;border:2px solid cyan;text-align:center;font-size:12px}
-  </style>
+<meta charset="UTF-8">
+<title>Jarvishneonopenai – Basic Web Development Programme</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:black;
+  color:#0ff;
+}
+.hidden{display:none}
+.center{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+h1{
+  font-size:42px;
+  text-shadow:0 0 20px cyan;
+}
+input,textarea,button{
+  padding:10px;
+  margin:8px;
+  border-radius:6px;
+  border:none;
+}
+button{
+  background:#0ff;
+  color:black;
+  font-weight:bold;
+  cursor:pointer;
+}
+#topBar{
+  display:flex;
+  justify-content:space-between;
+  padding:10px;
+  border-bottom:1px solid cyan;
+}
+#camera{
+  width:120px;
+  height:80px;
+  border:2px solid cyan;
+  font-size:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.option{margin:6px 0}
+</style>
 </head>
+
 <body>
 
-<!-- LOGIN SCREEN -->
+<!-- LOGIN -->
 <div id="loginScreen" class="center">
   <h1>Jarvishneonopenai</h1>
   <h3>Basic Web Development Programme</h3>
@@ -25,37 +65,171 @@
   <button id="loginBtn">Login</button>
 </div>
 
-<!-- EXAM SCREEN -->
+<!-- EXAM -->
 <div id="examScreen" class="hidden">
   <div id="topBar">
     <div>Student: <span id="studentName"></span></div>
-    <div>Time: <span id="examTimer"></span></div>
+    <div>Time: <span id="examTimer">50:00</span></div>
     <div id="camera">Live Monitoring</div>
   </div>
 
   <div style="padding:20px">
     <h2 id="question"></h2>
     <div id="options"></div>
-    <textarea id="answerBox" class="hidden" rows="5" cols="50"></textarea><br>
+    <textarea id="answerBox" class="hidden" rows="5" cols="60"></textarea><br>
     <button id="prevBtn">Previous</button>
     <button id="nextBtn">Save & Next</button>
   </div>
 </div>
 
-<!-- SUBMIT SCREEN -->
+<!-- SUBMIT -->
 <div id="submitScreen" class="center hidden">
   <h2>Submit Your Test</h2>
-  <button id="submitBtn">Submit</button>
+  <button id="submitBtn">Submit Test</button>
 </div>
 
-<!-- HISTORY SCREEN -->
+<!-- HISTORY -->
 <div id="historyScreen" class="center hidden">
   <h2>Check Exam History</h2>
   <input id="pin" placeholder="Enter Secret PIN">
-  <button id="historyBtn">Check</button>
+  <button id="historyBtn">Check History</button>
   <pre id="historyData"></pre>
 </div>
 
-<script src="script.js"></script>
+<script>
+// ================= CONFIG =================
+const validUser = "Pratigya";
+const validPass = "182727";
+const secretPin = "332277";
+
+// ================= DOM =================
+const loginScreen = document.getElementById("loginScreen");
+const examScreen = document.getElementById("examScreen");
+const submitScreen = document.getElementById("submitScreen");
+const historyScreen = document.getElementById("historyScreen");
+
+const username = document.getElementById("username");
+const password = document.getElementById("password");
+const studentName = document.getElementById("studentName");
+const examTimer = document.getElementById("examTimer");
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const answerBox = document.getElementById("answerBox");
+const pin = document.getElementById("pin");
+const historyData = document.getElementById("historyData");
+
+// ================= QUESTIONS =================
+const questions = [
+ {q:"What does HTML stand for?",options:["Hyper Tool Markup Language","Hyper Text Markup Language","High Text Machine Language","Hyper Transfer Markup Language"],type:"mcq"},
+ {q:"HTML is a programming language.",options:["True","False"],type:"tf"},
+ {q:"What are Heading tags in HTML?",type:"short"},
+ {q:"What is an Anchor tag?",type:"short"},
+ {q:"What is a Subscript tag?",type:"short"},
+ {q:"What is the use of colspan attribute in HTML?",type:"short"}
+];
+
+let index = 0;
+let answers = {};
+let timer;
+
+// ================= LOGIN =================
+document.getElementById("loginBtn").onclick = () => {
+  if(username.value === validUser && password.value === validPass){
+    loginScreen.classList.add("hidden");
+    startExam();
+  }else{
+    alert("Invalid Login Details");
+  }
+};
+
+// ================= EXAM =================
+function startExam(){
+  examScreen.classList.remove("hidden");
+  studentName.textContent = validUser;
+  startTimer();
+  loadQuestion();
+}
+
+function startTimer(){
+  let sec = 3000;
+  timer = setInterval(()=>{
+    let m = Math.floor(sec/60);
+    let s = sec % 60;
+    examTimer.textContent = `${m}:${s<10?'0'+s:s}`;
+    sec--;
+    if(sec < 0){
+      clearInterval(timer);
+      submitTest();
+    }
+  },1000);
+}
+
+function loadQuestion(){
+  const q = questions[index];
+  questionEl.textContent = q.q;
+  optionsEl.innerHTML = "";
+  answerBox.classList.add("hidden");
+
+  if(q.type === "short"){
+    answerBox.classList.remove("hidden");
+    answerBox.value = answers[index] || "";
+  }else{
+    q.options.forEach(opt=>{
+      optionsEl.innerHTML +=
+        `<div class="option">
+           <input type="radio" name="opt" value="${opt}"> ${opt}
+         </div>`;
+    });
+  }
+}
+
+function saveAnswer(){
+  const q = questions[index];
+  if(q.type === "short"){
+    answers[index] = answerBox.value;
+  }else{
+    const sel = document.querySelector("input[name='opt']:checked");
+    if(sel) answers[index] = sel.value;
+  }
+}
+
+document.getElementById("nextBtn").onclick = ()=>{
+  saveAnswer();
+  if(index < questions.length-1){
+    index++;
+    loadQuestion();
+  }else{
+    examScreen.classList.add("hidden");
+    submitScreen.classList.remove("hidden");
+  }
+};
+
+document.getElementById("prevBtn").onclick = ()=>{
+  if(index>0){
+    index--;
+    loadQuestion();
+  }
+};
+
+// ================= SUBMIT =================
+document.getElementById("submitBtn").onclick = submitTest;
+
+function submitTest(){
+  localStorage.setItem("examAnswers",JSON.stringify(answers));
+  examScreen.classList.add("hidden");
+  submitScreen.classList.add("hidden");
+  historyScreen.classList.remove("hidden");
+}
+
+// ================= HISTORY =================
+document.getElementById("historyBtn").onclick = ()=>{
+  if(pin.value === secretPin){
+    historyData.textContent = localStorage.getItem("examAnswers");
+  }else{
+    alert("Wrong PIN");
+  }
+};
+</script>
+
 </body>
 </html>
