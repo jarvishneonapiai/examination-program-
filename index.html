@@ -20,7 +20,7 @@ body{
   align-items:center;
 }
 h1{
-  font-size:42px;
+  font-size:40px;
   text-shadow:0 0 20px cyan;
 }
 input,textarea,button{
@@ -80,9 +80,10 @@ button{
   </div>
 
   <div style="padding:20px">
+    <h3 id="sectionTitle"></h3>
     <h2 id="question"></h2>
     <div id="options"></div>
-    <textarea id="answerBox" class="hidden" rows="5" cols="60"></textarea><br>
+    <textarea id="answerBox" class="hidden" rows="6" cols="70"></textarea><br>
     <button id="prevBtn">Previous</button>
     <button id="nextBtn">Save & Next</button>
   </div>
@@ -103,51 +104,62 @@ button{
 </div>
 
 <script>
-// ===== CONFIG =====
+// ================= CONFIG =================
 const validUser="Pratigya";
 const validPass="182727";
 const secretPin="332277";
 
-// ===== DOM =====
+// ================= SCREENS =================
 const screens=["loginScreen","examScreen","submitScreen","historyScreen"];
 const hideAll=()=>screens.forEach(id=>document.getElementById(id).classList.add("hidden"));
 
-const studentName=document.getElementById("studentName");
-const examTimer=document.getElementById("examTimer");
-const questionEl=document.getElementById("question");
-const optionsEl=document.getElementById("options");
-const answerBox=document.getElementById("answerBox");
-const historyData=document.getElementById("historyData");
-
-// ===== QUESTIONS =====
+// ================= QUESTIONS (FULL – EXACT AS GIVEN) =================
 const questions=[
-{q:"What does HTML stand for?",options:["Hyper Tool Markup Language","Hyper Text Markup Language","High Text Machine Language","Hyper Transfer Markup Language"],type:"mcq"},
-{q:"HTML is mainly used to structure web pages.",options:["True","False"],type:"tf"},
-{q:"HTML tags are used to structure web pages.",options:["True","False"],type:"tf"},
-{q:"What are Heading tags in HTML?",type:"short"},
-{q:"What is an Anchor tag?",type:"short"},
-{q:"What is a Subscript tag?",type:"short"},
-{q:"What is the use of colspan attribute in HTML?",type:"short"},
-{q:"Write basic structure of HTML.",type:"short"}
+/* Section A – MCQs */
+{sec:"Section A: MCQs",q:"1. What does HTML stand for?",type:"mcq",options:["Hyper Tool Markup Language","Hyper Text Markup Language","High Text Machine Language","Hyper Transfer Markup Language"]},
+{sec:"Section A: MCQs",q:"2. HTML is mainly used to:",type:"mcq",options:["Design graphics","Create databases","Structure a web page and its content","Perform calculations"]},
+{sec:"Section A: MCQs",q:"3. Which component is used to design the structure of a website?",type:"mcq",options:["HTML attributes","HTML tags","CSS styles","JavaScript functions"]},
+{sec:"Section A: MCQs",q:"4. What is the default name of a website’s homepage file?",type:"mcq",options:["home.html","start.html","index.html","main.html"]},
+{sec:"Section A: MCQs",q:"5. Which HTML tag is used to define a paragraph?",type:"mcq",options:["<h1>","<p>","<title>","<body>"]},
+{sec:"Section A: MCQs",q:"6. Which declaration tells the browser that the document uses HTML5?",type:"mcq",options:["<html5>","<meta>","<!DOCTYPE html>","<doctype>"]},
+
+/* Section B – True / False */
+{sec:"Section B: True / False",q:"7. HTML is a programming language.",type:"tf",options:["True","False"]},
+{sec:"Section B: True / False",q:"8. HTML tags are used to structure web pages.",type:"tf",options:["True","False"]},
+{sec:"Section B: True / False",q:"9. index.html is the default file name for a website’s homepage.",type:"tf",options:["True","False"]},
+{sec:"Section B: True / False",q:"10. The <head> tag contains metadata.",type:"tf",options:["True","False"]},
+{sec:"Section B: True / False",q:"11. The <body> tag contains all the content rendered by the browser.",type:"tf",options:["True","False"]},
+
+/* Section C – Short Answer */
+{sec:"Section C: Short Answer",q:"12. What is HTML?",type:"short"},
+{sec:"Section C: Short Answer",q:"13. What is an HTML tag?",type:"short"},
+{sec:"Section C: Short Answer",q:"14. What is the difference between <head> and <body> tags?",type:"short"},
+{sec:"Section C: Short Answer",q:"15. What is an HTML element?",type:"short"},
+{sec:"Section C: Short Answer",q:"16. What are Heading tags in HTML?",type:"short"},
+{sec:"Section C: Short Answer",q:"17. What is an Anchor tag?",type:"short"},
+{sec:"Section C: Short Answer",q:"18. What is a Subscript tag?",type:"short"},
+{sec:"Section C: Short Answer",q:"19. What is the use of the colspan attribute in HTML?",type:"short"},
+
+/* Section D – Practical */
+{sec:"Section D: Practical",q:"20. Write an HTML code to display “Hello World” on a web page.",type:"short"},
+{sec:"Section D: Practical",q:"21. Write the basic structure of an HTML page.",type:"short"},
+{sec:"Section D: Practical",q:"22. Write an HTML code to create a paragraph using the <p> tag.",type:"short"}
 ];
 
 let index=0,answers={},timer;
 
-// ===== LOGIN =====
-document.getElementById("loginBtn").onclick=()=>{
+// ================= LOGIN =================
+loginBtn.onclick=()=>{
  if(username.value===validUser && password.value===validPass){
-  hideAll();
-  startExam();
- }else alert("Invalid Login");
+  hideAll(); startExam();
+ } else alert("Invalid Login");
 };
 
-// ===== EXAM =====
+// ================= EXAM =================
 function startExam(){
- document.getElementById("examScreen").classList.remove("hidden");
+ examScreen.classList.remove("hidden");
  studentName.textContent=validUser;
- startTimer();
- loadQuestion();
- startCamera();
+ startTimer(); loadQuestion(); startCamera();
 }
 
 function startTimer(){
@@ -162,26 +174,27 @@ function startTimer(){
 
 function loadQuestion(){
  const q=questions[index];
- questionEl.textContent=q.q;
- optionsEl.innerHTML="";
+ sectionTitle.textContent=q.sec;
+ question.textContent=q.q;
+ options.innerHTML="";
  answerBox.classList.add("hidden");
 
  if(q.type==="short"){
   answerBox.classList.remove("hidden");
   answerBox.value=answers[index]||"";
- }else{
+ } else {
   q.options.forEach(o=>{
-   optionsEl.innerHTML+=`<div class="option"><input type="radio" name="opt" value="${o}"> ${o}</div>`;
+   options.innerHTML+=`<div class="option"><input type="radio" name="opt" value="${o}"> ${o}</div>`;
   });
  }
 }
 
 function saveAnswer(){
  const q=questions[index];
- if(q.type==="short")answers[index]=answerBox.value;
+ if(q.type==="short") answers[index]=answerBox.value;
  else{
   const sel=document.querySelector("input[name='opt']:checked");
-  if(sel)answers[index]=sel.value;
+  if(sel) answers[index]=sel.value;
  }
 }
 
@@ -192,24 +205,23 @@ nextBtn.onclick=()=>{
 };
 prevBtn.onclick=()=>{if(index>0){index--;loadQuestion();}};
 
-// ===== SUBMIT =====
+// ================= SUBMIT =================
 submitBtn.onclick=submitTest;
 function submitTest(){
  localStorage.setItem("examAnswers",JSON.stringify(answers));
- hideAll();
- historyScreen.classList.remove("hidden");
+ hideAll(); historyScreen.classList.remove("hidden");
 }
 
-// ===== HISTORY =====
+// ================= HISTORY =================
 historyBtn.onclick=()=>{
- if(pin.value===secretPin)historyData.textContent=localStorage.getItem("examAnswers");
+ if(pin.value===secretPin) historyData.textContent=localStorage.getItem("examAnswers");
  else alert("Wrong PIN");
 };
 
-// ===== CAMERA =====
+// ================= CAMERA =================
 function startCamera(){
  navigator.mediaDevices.getUserMedia({video:true})
- .then(stream=>{document.getElementById("camera").srcObject=stream;})
+ .then(stream=>camera.srcObject=stream)
  .catch(()=>console.log("Camera blocked"));
 }
 </script>
