@@ -1,109 +1,132 @@
+window.onload = function () {
+
 const validUser = "Pratigya";
 const validPass = "182727";
 const secretPin = "332277";
 
-// DOM elements
+// DOM
 const loginScreen = document.getElementById("loginScreen");
 const waitScreen = document.getElementById("waitScreen");
 const examScreen = document.getElementById("examScreen");
 const submitScreen = document.getElementById("submitScreen");
 const historyScreen = document.getElementById("historyScreen");
 
-const usernameInput = document.getElementById("username");
-const passwordInput = document.getElementById("password");
-const waitTimerEl = document.getElementById("waitTimer");
-const studentNameEl = document.getElementById("studentName");
-const examTimerEl = document.getElementById("examTimer");
-const questionEl = document.getElementById("question");
-const optionsEl = document.getElementById("options");
+const username = document.getElementById("username");
+const password = document.getElementById("password");
+const waitTimer = document.getElementById("waitTimer");
+const studentName = document.getElementById("studentName");
+const examTimer = document.getElementById("examTimer");
+const question = document.getElementById("question");
+const options = document.getElementById("options");
 const answerBox = document.getElementById("answerBox");
-const pinInput = document.getElementById("pin");
+const pin = document.getElementById("pin");
 const historyData = document.getElementById("historyData");
 
+// Buttons
+document.getElementById("loginBtn").addEventListener("click", login);
+document.getElementById("nextBtn").addEventListener("click", saveNext);
+document.getElementById("prevBtn").addEventListener("click", prevQuestion);
+document.getElementById("submitBtn").addEventListener("click", submitTest);
+document.getElementById("historyBtn").addEventListener("click", checkHistory);
+
+let index = 0;
+let answers = {};
+
 let questions = [
-  // MCQs
-  { q: "What does HTML stand for?", options: ["Hyper Tool Markup Language", "Hyper Text Markup Language", "High Text Machine Language", "Hyper Transfer Markup Language"], type: "mcq" },
-  { q: "HTML is mainly used to:", options: ["Design graphics", "Create databases", "Structure a web page and its content", "Perform calculations"], type: "mcq" },
-  { q: "Which component is used to design the structure of a website?", options: ["HTML attributes", "HTML tags", "CSS styles", "JavaScript functions"], type: "mcq" },
-  { q: "What is the default name of a website’s homepage file?", options: ["home.html", "start.html", "index.html", "main.html"], type: "mcq" },
-  { q: "Which HTML tag is used to define a paragraph?", options: ["<h1>", "<p>", "<title>", "<body>"], type: "mcq" },
-  { q: "Which declaration tells the browser that the document uses HTML5?", options: ["<html5>", "<meta>", "<!DOCTYPE html>", "<doctype>"], type: "mcq" },
-
-  // True / False
-  { q: "HTML is a programming language.", options: ["True", "False"], type: "tf" },
-  { q: "HTML tags are used to structure web pages.", options: ["True", "False"], type: "tf" },
-  { q: "index.html is the default file name for a website’s homepage.", options: ["True", "False"], type: "tf" },
-  { q: "The <head> tag contains metadata.", options: ["True", "False"], type: "tf" },
-  { q: "The <body> tag contains all the content rendered by the browser.", options: ["True", "False"], type: "tf" },
-
-  // Short Answer & Practical
-  { q: "What is HTML?", type: "short" },
-  { q: "What is an HTML tag?", type: "short" },
-  { q: "What is the difference between <head> and <body> tags?", type: "short" },
-  { q: "What is an HTML element?", type: "short" },
-  { q: "What are Heading tags in HTML?", type: "short" },
-  { q: "What is an Anchor tag?", type: "short" },
-  { q: "What is a Subscript tag?", type: "short" },
-  { q: "What is the use of the colspan attribute in HTML?", type: "short" },
-  { q: "Write an HTML code to display Hello World.", type: "short" },
-  { q: "Write the basic structure of an HTML page.", type: "short" },
-  { q: "Write an HTML code to create a paragraph using the <p> tag.", type: "short" }
+  { q: "What does HTML stand for?", options: ["Hyper Tool Markup Language","Hyper Text Markup Language","High Text Machine Language","Hyper Transfer Markup Language"], type: "mcq" },
+  { q: "HTML is a programming language.", options: ["True","False"], type: "tf" },
+  { q: "What is HTML?", type: "short" }
 ];
 
-let answers = {};
-let index = 0;
-let waitInterval = null;
-let examInterval = null;
-
+// LOGIN
 function login() {
-  if (usernameInput.value === validUser && passwordInput.value === validPass) {
+  if (username.value === validUser && password.value === validPass) {
     loginScreen.classList.add("hidden");
     waitScreen.classList.remove("hidden");
     startWait();
   } else {
-    alert("Invalid Login Details");
+    alert("Invalid Login");
   }
 }
 
+// WAIT TIMER
 function startWait() {
-  let timeLeft = 300; // 5 minutes
-  waitTimerEl.textContent = timeLeft;
-  waitInterval = setInterval(() => {
-    timeLeft--;
-    waitTimerEl.textContent = timeLeft;
-    if (timeLeft <= 0) {
-      clearInterval(waitInterval);
+  let t = 300;
+  waitTimer.innerText = t;
+  let i = setInterval(() => {
+    t--;
+    waitTimer.innerText = t;
+    if (t <= 0) {
+      clearInterval(i);
       startExam();
     }
   }, 1000);
 }
 
+// START EXAM
 function startExam() {
   waitScreen.classList.add("hidden");
   examScreen.classList.remove("hidden");
-  studentNameEl.textContent = validUser;
+  studentName.innerText = validUser;
   startExamTimer();
   loadQuestion();
 }
 
+// EXAM TIMER
 function startExamTimer() {
-  let seconds = 3000; // 50 minutes
-  examTimerEl.textContent = "50:00";
-  examInterval = setInterval(() => {
-    let m = Math.floor(seconds / 60);
-    let s = seconds % 60;
-    examTimerEl.textContent = `${m}:${s < 10 ? "0" + s : s}`;
-    seconds--;
-    if (seconds < 0) {
-      clearInterval(examInterval);
-      submitTest();
-    }
+  let sec = 3000;
+  setInterval(() => {
+    let m = Math.floor(sec / 60);
+    let s = sec % 60;
+    examTimer.innerText = `${m}:${s < 10 ? "0" + s : s}`;
+    sec--;
+    if (sec < 0) submitTest();
   }, 1000);
 }
 
+// QUESTIONS
 function loadQuestion() {
-  const q = questions[index];
-  questionEl.textContent = q.q;
+  let q = questions[index];
+  question.innerText = q.q;
+  options.innerHTML = "";
+  answerBox.classList.add("hidden");
+
+  if (q.type !== "short") {
+    q.options.forEach(op => {
+      options.innerHTML += `<div><input type="radio" name="opt" value="${op}"> ${op}</div>`;
+    });
+  } else {
+    answerBox.classList.remove("hidden");
+  }
+}
+
+function saveNext() {
+  index++;
+  if (index < questions.length) loadQuestion();
+  else submitScreen.classList.remove("hidden");
+}
+
+function prevQuestion() {
+  if (index > 0) {
+    index--;
+    loadQuestion();
+  }
+}
+
+function submitTest() {
+  localStorage.setItem("examAnswers", JSON.stringify(answers));
+  examScreen.classList.add("hidden");
+  submitScreen.classList.add("hidden");
+  historyScreen.classList.remove("hidden");
+}
+
+function checkHistory() {
+  if (pin.value === secretPin) {
+    historyData.innerText = localStorage.getItem("examAnswers");
+  } else alert("Wrong PIN");
+}
+
+};
   optionsEl.innerHTML = "";
   answerBox.classList.add("hidden");
 
