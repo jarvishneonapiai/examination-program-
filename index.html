@@ -19,6 +19,20 @@ body{
   justify-content:center;
   align-items:center;
 }
+/* Blinking Text Animation */
+@keyframes blinker {
+  50% { opacity: 0; }
+}
+.blink-text {
+  animation: blinker 1s linear infinite;
+  color: yellow;
+  font-weight: bold;
+  font-size: 24px;
+  text-align: center;
+  margin-top: 10px;
+  text-shadow: 0 0 10px red;
+}
+
 h1{
   font-size:40px;
   text-shadow:0 0 20px cyan;
@@ -54,14 +68,17 @@ button{
   height:100%;
   object-fit:cover;
 }
-.option{margin:6px 0}
+.option{margin:6px 0; font-size: 18px;}
 </style>
 </head>
 
 <body>
 
+<!-- BLINKING HEADER LINE -->
+<div class="blink-text">JARVISHNEONWEBDEVELOPMENT.PROGRAM</div>
+
 <!-- LOGIN -->
-<div id="loginScreen" class="center">
+<div id="loginScreen" class="center" style="height: 90vh;"> 
   <h1>Jarvishneonopenai</h1>
   <h3>Basic Web Development Programme</h3>
   <input id="username" placeholder="Username">
@@ -113,13 +130,14 @@ const secretPin="332277";
 const screens=["loginScreen","examScreen","submitScreen","historyScreen"];
 const hideAll=()=>screens.forEach(id=>document.getElementById(id).classList.add("hidden"));
 
-// ================= QUESTIONS (FULL – EXACT AS GIVEN) =================
+// ================= QUESTIONS =================
 const questions=[
 /* Section A – MCQs */
 {sec:"Section A: MCQs",q:"1. What does HTML stand for?",type:"mcq",options:["Hyper Tool Markup Language","Hyper Text Markup Language","High Text Machine Language","Hyper Transfer Markup Language"]},
 {sec:"Section A: MCQs",q:"2. HTML is mainly used to:",type:"mcq",options:["Design graphics","Create databases","Structure a web page and its content","Perform calculations"]},
 {sec:"Section A: MCQs",q:"3. Which component is used to design the structure of a website?",type:"mcq",options:["HTML attributes","HTML tags","CSS styles","JavaScript functions"]},
 {sec:"Section A: MCQs",q:"4. What is the default name of a website’s homepage file?",type:"mcq",options:["home.html","start.html","index.html","main.html"]},
+// Note: Using special logic below to display these tags correctly
 {sec:"Section A: MCQs",q:"5. Which HTML tag is used to define a paragraph?",type:"mcq",options:["<h1>","<p>","<title>","<body>"]},
 {sec:"Section A: MCQs",q:"6. Which declaration tells the browser that the document uses HTML5?",type:"mcq",options:["<html5>","<meta>","<!DOCTYPE html>","<doctype>"]},
 
@@ -172,6 +190,16 @@ function startTimer(){
  },1000);
 }
 
+// Function to safely display HTML tags in options
+function escapeHtml(text) {
+  return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+}
+
 function loadQuestion(){
  const q=questions[index];
  sectionTitle.textContent=q.sec;
@@ -183,8 +211,18 @@ function loadQuestion(){
   answerBox.classList.remove("hidden");
   answerBox.value=answers[index]||"";
  } else {
+  // Logic updated to handle HTML tags in options
   q.options.forEach(o=>{
-   options.innerHTML+=`<div class="option"><input type="radio" name="opt" value="${o}"> ${o}</div>`;
+   // We escape the text so <p> shows as text, not a tag
+   let displayLabel = escapeHtml(o); 
+   // Check if this option was previously selected
+   let checked = (answers[index] === o) ? "checked" : "";
+   
+   options.innerHTML+=`
+     <div class="option">
+       <input type="radio" name="opt" value="${escapeHtml(o)}" ${checked}> 
+       ${displayLabel}
+     </div>`;
   });
  }
 }
@@ -194,7 +232,8 @@ function saveAnswer(){
  if(q.type==="short") answers[index]=answerBox.value;
  else{
   const sel=document.querySelector("input[name='opt']:checked");
-  if(sel) answers[index]=sel.value;
+  // We decode the value back if needed, but keeping it simple usually works
+  if(sel) answers[index]=sel.value.replace(/&lt;/g, "<").replace(/&gt;/g, ">"); 
  }
 }
 
@@ -203,7 +242,10 @@ nextBtn.onclick=()=>{
  if(index<questions.length-1){index++;loadQuestion();}
  else{hideAll();submitScreen.classList.remove("hidden");}
 };
-prevBtn.onclick=()=>{if(index>0){index--;loadQuestion();}};
+prevBtn.onclick=()=>{
+ saveAnswer(); // Save before going back too
+ if(index>0){index--;loadQuestion();}
+};
 
 // ================= SUBMIT =================
 submitBtn.onclick=submitTest;
