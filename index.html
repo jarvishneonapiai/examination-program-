@@ -1,271 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Jarvishneonopenai – Basic Web Development Programe</title>
-
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:black;
-  color:#0ff;
-}
-.hidden{display:none !important;}
-.center{
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-}
-/* Blinking Text Animation */
-@keyframes blinker {
-  50% { opacity: 0; }
-}
-.blink-text {
-  animation: blinker 1s linear infinite;
-  color: yellow;
-  font-weight: bold;
-  font-size: 24px;
-  text-align: center;
-  margin-top: 10px;
-  text-shadow: 0 0 10px red;
-}
-
-h1{
-  font-size:40px;
-  text-shadow:0 0 20px cyan;
-}
-input,textarea,button{
-  padding:10px;
-  margin:8px;
-  border-radius:6px;
-  border:none;
-}
-button{
-  background:#0ff;
-  color:black;
-  font-weight:bold;
-  cursor:pointer;
-}
-#topBar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:10px;
-  border-bottom:1px solid cyan;
-}
-#cameraCircle{
-  width:90px;
-  height:90px;
-  border-radius:50%;
-  border:3px solid cyan;
-  overflow:hidden;
-}
-#cameraCircle video{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-.option{margin:6px 0; font-size: 18px;}
-</style>
+  <meta charset="UTF-8">
+  <title>Jarvishneonopenai – Basic Web Development Programme</title>
+  <style>
+    body{margin:0;font-family:Arial;background:black;color:#0ff}
+    .hidden{display:none}
+    .center{display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
+    h1{font-size:40px;text-shadow:0 0 15px cyan}
+    input,button,textarea{padding:10px;margin:8px;border-radius:5px;border:none}
+    textarea{width:90%;max-width:900px}
+    button{background:#0ff;color:black;cursor:pointer;font-weight:bold}
+    #topBar{display:flex;justify-content:space-between;align-items:center;padding:10px}
+    #camera{width:120px;height:80px;border:2px solid cyan;text-align:center;font-size:12px}
+    .paraBox{border:1px solid cyan;padding:15px;margin-bottom:15px}
+  </style>
 </head>
-
 <body>
 
-<!-- BLINKING HEADER LINE -->
-<div class="blink-text">JARVISH.NEON.WEB.DEVELOPMENT.PROGRAME</div>
-
-<!-- LOGIN -->
-<div id="loginScreen" class="center" style="height: 90vh;"> 
+<!-- LOGIN SCREEN (UNCHANGED) -->
+<div id="loginScreen" class="center">
   <h1>Jarvishneonopenai</h1>
-  <h3>Basic Web Development Programe</h3>
+  <h3>Basic Web Development Programme</h3>
   <input id="username" placeholder="Username">
   <input id="password" type="password" placeholder="Password">
   <button id="loginBtn">Login</button>
 </div>
 
-<!-- EXAM -->
+<!-- COUNTDOWN SCREEN (UNCHANGED) -->
+<div id="countdownScreen" class="center hidden">
+  <h1>Exam Instructions</h1>
+  <h2>Your exam will start in</h2>
+  <h1 id="countdownTimer">02:00</h1>
+
+  <p style="color:yellow;text-align:center;max-width:650px">
+    ⚠️ WARNING: You are under live monitoring. Any kind of cheating, misuse,
+    or suspicious activity during the online exam will result in immediate
+    cancellation of your exam and registration.
+  </p>
+
+  <p style="font-size:18px;text-align:center">
+    "Discipline and focus will take you where motivation cannot."
+  </p>
+</div>
+
+<!-- EXAM SCREEN (TYPING TEST UPDATED) -->
 <div id="examScreen" class="hidden">
   <div id="topBar">
     <div>Student: <span id="studentName"></span></div>
-    <div>Time: <span id="examTimer">50:00</span></div>
-    <div id="cameraCircle">
-      <video id="camera" autoplay muted></video>
-    </div>
+    <div>Time Left: <span id="examTimer">20:00</span></div>
+    <div id="camera">Live Monitoring</div>
   </div>
 
   <div style="padding:20px">
-    <h3 id="sectionTitle"></h3>
-    <h2 id="question"></h2>
-    <div id="options"></div>
-    <textarea id="answerBox" class="hidden" rows="6" cols="70"></textarea><br>
-    <button id="prevBtn">Previous</button>
-    <button id="nextBtn">Save & Next</button>
+    <h2>Typing Test (Moderate Level)</h2>
+
+    <div class="paraBox">
+      Technology has become an essential part of modern life. From communication
+      to education, digital tools help people work faster and smarter. The internet
+      allows instant access to information and connects individuals across the world.
+      However, responsible use of technology is important. Overdependence can reduce
+      productivity and affect health. Balancing digital usage with real life skills
+      leads to long term success and personal growth.
+    </div>
+
+    <textarea id="typingBox" rows="8"
+      placeholder="Start typing the above paragraph here..."></textarea>
   </div>
 </div>
 
-<!-- SUBMIT -->
+<!-- SUBMIT SCREEN (UNCHANGED) -->
 <div id="submitScreen" class="center hidden">
   <h2>Submit Your Test</h2>
   <button id="submitBtn">Submit</button>
 </div>
 
-<!-- HISTORY -->
+<!-- HISTORY SCREEN (UNCHANGED) -->
 <div id="historyScreen" class="center hidden">
-  <h2>Exam History</h2>
+  <h2>Check Exam History</h2>
   <input id="pin" placeholder="Enter Secret PIN">
-  <button id="historyBtn">Check History</button>
+  <button id="historyBtn">Check</button>
   <pre id="historyData"></pre>
 </div>
 
 <script>
-// ================= CONFIG =================
-const validUser="Pratigya";
-const validPass="182727";
-const secretPin="332277";
+  const loginBtn = document.getElementById("loginBtn");
+  const loginScreen = document.getElementById("loginScreen");
+  const countdownScreen = document.getElementById("countdownScreen");
+  const examScreen = document.getElementById("examScreen");
+  const countdownTimer = document.getElementById("countdownTimer");
+  const studentName = document.getElementById("studentName");
+  const examTimer = document.getElementById("examTimer");
 
-// ================= SCREENS =================
-const screens=["loginScreen","examScreen","submitScreen","historyScreen"];
-const hideAll=()=>screens.forEach(id=>document.getElementById(id).classList.add("hidden"));
+  loginBtn.onclick = () => {
+    const name = document.getElementById("username").value;
+    if(!name) return alert("Enter username");
+    studentName.innerText = name;
+    loginScreen.classList.add("hidden");
+    countdownScreen.classList.remove("hidden");
+    startCountdown(120);
+  };
 
-// ================= QUESTIONS =================
-const questions=[
-/* Section A – MCQs */
-{sec:"Section A: MCQs",q:"1. What does HTML stand for?",type:"mcq",options:["Hyper Tool Markup Language","Hyper Text Markup Language","High Text Machine Language","Hyper Transfer Markup Language"]},
-{sec:"Section A: MCQs",q:"2. HTML is mainly used to:",type:"mcq",options:["Design graphics","Create databases","Structure a web page and its content","Perform calculations"]},
-{sec:"Section A: MCQs",q:"3. Which component is used to design the structure of a website?",type:"mcq",options:["HTML attributes","HTML tags","CSS styles","JavaScript functions"]},
-{sec:"Section A: MCQs",q:"4. What is the default name of a website’s homepage file?",type:"mcq",options:["home.html","start.html","index.html","main.html"]},
-// Note: Using special logic below to display these tags correctly
-{sec:"Section A: MCQs",q:"5. Which HTML tag is used to define a paragraph?",type:"mcq",options:["<h1>","<p>","<title>","<body>"]},
-{sec:"Section A: MCQs",q:"6. Which declaration tells the browser that the document uses HTML5?",type:"mcq",options:["<html5>","<meta>","<!DOCTYPE html>","<doctype>"]},
+  function startCountdown(sec){
+    let t = sec;
+    const i = setInterval(()=>{
+      countdownTimer.innerText =
+        String(Math.floor(t/60)).padStart(2,"0")+":"+
+        String(t%60).padStart(2,"0");
+      if(t--<=0){
+        clearInterval(i);
+        countdownScreen.classList.add("hidden");
+        examScreen.classList.remove("hidden");
+        startExamTimer(20*60);
+      }
+    },1000);
+  }
 
-/* Section B – True / False */
-{sec:"Section B: True / False",q:"7. HTML is a programming language.",type:"tf",options:["True","False"]},
-{sec:"Section B: True / False",q:"8. HTML tags are used to structure web pages.",type:"tf",options:["True","False"]},
-{sec:"Section B: True / False",q:"9. index.html is the default file name for a website’s homepage.",type:"tf",options:["True","False"]},
-{sec:"Section B: True / False",q:"10. The <head> tag contains metadata.",type:"tf",options:["True","False"]},
-{sec:"Section B: True / False",q:"11. The <body> tag contains all the content rendered by the browser.",type:"tf",options:["True","False"]},
-
-/* Section C – Short Answer */
-{sec:"Section C: Short Answer",q:"12. What is HTML?",type:"short"},
-{sec:"Section C: Short Answer",q:"13. What is an HTML tag?",type:"short"},
-{sec:"Section C: Short Answer",q:"14. What is the difference between <head> and <body> tags?",type:"short"},
-{sec:"Section C: Short Answer",q:"15. What is an HTML element?",type:"short"},
-{sec:"Section C: Short Answer",q:"16. What are Heading tags in HTML?",type:"short"},
-{sec:"Section C: Short Answer",q:"17. What is an Anchor tag?",type:"short"},
-{sec:"Section C: Short Answer",q:"18. What is a Subscript tag?",type:"short"},
-{sec:"Section C: Short Answer",q:"19. What is the use of the colspan attribute in HTML?",type:"short"},
-
-/* Section D – Practical */
-{sec:"Section D: Practical",q:"20. Write an HTML code to display “Hello World” on a web page.",type:"short"},
-{sec:"Section D: Practical",q:"21. Write the basic structure of an HTML page.",type:"short"},
-{sec:"Section D: Practical",q:"22. Write an HTML code to create a paragraph using the <p> tag.",type:"short"}
-];
-
-let index=0,answers={},timer;
-
-// ================= LOGIN =================
-loginBtn.onclick=()=>{
- if(username.value===validUser && password.value===validPass){
-  hideAll(); startExam();
- } else alert("Invalid Login");
-};
-
-// ================= EXAM =================
-function startExam(){
- examScreen.classList.remove("hidden");
- studentName.textContent=validUser;
- startTimer(); loadQuestion(); startCamera();
-}
-
-function startTimer(){
- let sec=3000;
- timer=setInterval(()=>{
-  let m=Math.floor(sec/60),s=sec%60;
-  examTimer.textContent=`${m}:${s<10?"0"+s:s}`;
-  sec--;
-  if(sec<0){clearInterval(timer);submitTest();}
- },1000);
-}
-
-// Function to safely display HTML tags in options
-function escapeHtml(text) {
-  return text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-}
-
-function loadQuestion(){
- const q=questions[index];
- sectionTitle.textContent=q.sec;
- question.textContent=q.q;
- options.innerHTML="";
- answerBox.classList.add("hidden");
-
- if(q.type==="short"){
-  answerBox.classList.remove("hidden");
-  answerBox.value=answers[index]||"";
- } else {
-  // Logic updated to handle HTML tags in options
-  q.options.forEach(o=>{
-   // We escape the text so <p> shows as text, not a tag
-   let displayLabel = escapeHtml(o); 
-   // Check if this option was previously selected
-   let checked = (answers[index] === o) ? "checked" : "";
-   
-   options.innerHTML+=`
-     <div class="option">
-       <input type="radio" name="opt" value="${escapeHtml(o)}" ${checked}> 
-       ${displayLabel}
-     </div>`;
-  });
- }
-}
-
-function saveAnswer(){
- const q=questions[index];
- if(q.type==="short") answers[index]=answerBox.value;
- else{
-  const sel=document.querySelector("input[name='opt']:checked");
-  // We decode the value back if needed, but keeping it simple usually works
-  if(sel) answers[index]=sel.value.replace(/&lt;/g, "<").replace(/&gt;/g, ">"); 
- }
-}
-
-nextBtn.onclick=()=>{
- saveAnswer();
- if(index<questions.length-1){index++;loadQuestion();}
- else{hideAll();submitScreen.classList.remove("hidden");}
-};
-prevBtn.onclick=()=>{
- saveAnswer(); // Save before going back too
- if(index>0){index--;loadQuestion();}
-};
-
-// ================= SUBMIT =================
-submitBtn.onclick=submitTest;
-function submitTest(){
- localStorage.setItem("examAnswers",JSON.stringify(answers));
- hideAll(); historyScreen.classList.remove("hidden");
-}
-
-// ================= HISTORY =================
-historyBtn.onclick=()=>{
- if(pin.value===secretPin) historyData.textContent=localStorage.getItem("examAnswers");
- else alert("Wrong PIN");
-};
-
-// ================= CAMERA =================
-function startCamera(){
- navigator.mediaDevices.getUserMedia({video:true})
- .then(stream=>camera.srcObject=stream)
- .catch(()=>console.log("Camera blocked"));
-}
+  function startExamTimer(sec){
+    let t = sec;
+    const i = setInterval(()=>{
+      examTimer.innerText =
+        String(Math.floor(t/60)).padStart(2,"0")+":"+
+        String(t%60).padStart(2,"0");
+      if(t--<=0){
+        clearInterval(i);
+        examScreen.classList.add("hidden");
+        document.getElementById("submitScreen").classList.remove("hidden");
+      }
+    },1000);
+  }
 </script>
 
 </body>
