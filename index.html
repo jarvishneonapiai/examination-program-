@@ -1,134 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Jarvishneonopenai – Basic Web Development Programme</title>
-  <style>
-    body{margin:0;font-family:Arial;background:black;color:#0ff}
-    .hidden{display:none}
-    .center{display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
-    h1{font-size:40px;text-shadow:0 0 15px cyan}
-    input,button,textarea{padding:10px;margin:8px;border-radius:5px;border:none}
-    textarea{width:90%;max-width:900px}
-    button{background:#0ff;color:black;cursor:pointer;font-weight:bold}
-    #topBar{display:flex;justify-content:space-between;align-items:center;padding:10px}
-    #camera{width:120px;height:80px;border:2px solid cyan;text-align:center;font-size:12px}
-    .paraBox{border:1px solid cyan;padding:15px;margin-bottom:15px}
-  </style>
+<meta charset="UTF-8">
+<title>Typing Test – Jarvishneonopenai</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:black;
+  color:#0ff;
+}
+.hidden{display:none}
+.center{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  flex-direction:column;
+  text-align:center;
+}
+input,button,textarea{
+  padding:10px;
+  margin:8px;
+  border-radius:5px;
+  border:none;
+}
+button{
+  background:#0ff;
+  color:black;
+  font-weight:bold;
+  cursor:pointer;
+}
+textarea{
+  width:90%;
+  max-width:900px;
+}
+.paraBox{
+  border:1px solid cyan;
+  padding:15px;
+  margin-bottom:15px;
+}
+
+/* bottom floating bar */
+#floatingInfo{
+  position:fixed;
+  bottom:10px;
+  right:10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:14px;
+}
+
+/* camera circle */
+#camera{
+  width:60px;
+  height:60px;
+  border:2px solid cyan;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:10px;
+}
+</style>
 </head>
+
 <body>
 
-<!-- LOGIN SCREEN (UNCHANGED) -->
+<!-- LOGIN -->
 <div id="loginScreen" class="center">
   <h1>Jarvishneonopenai</h1>
   <h3>Basic Web Development Programme</h3>
   <input id="username" placeholder="Username">
-  <input id="password" type="password" placeholder="Password">
-  <button id="loginBtn">Login</button>
+  <input type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
 </div>
 
-<!-- COUNTDOWN SCREEN (UNCHANGED) -->
+<!-- COUNTDOWN ONLY -->
 <div id="countdownScreen" class="center hidden">
-  <h1>Exam Instructions</h1>
   <h2>Your exam will start in</h2>
-  <h1 id="countdownTimer">02:00</h1>
+  <h1 id="countdown">02:00</h1>
 
-  <p style="color:yellow;text-align:center;max-width:650px">
-    ⚠️ WARNING: You are under live monitoring. Any kind of cheating, misuse,
-    or suspicious activity during the online exam will result in immediate
+  <p style="color:yellow;max-width:650px">
+    ⚠️ WARNING: You are under live monitoring. Any cheating, misuse,
+    tab switching, or suspicious activity will result in immediate
     cancellation of your exam and registration.
   </p>
 
-  <p style="font-size:18px;text-align:center">
-    "Discipline and focus will take you where motivation cannot."
+  <p>
+    "Discipline is choosing between what you want now and what you want most."
   </p>
 </div>
 
-<!-- EXAM SCREEN (TYPING TEST UPDATED) -->
-<div id="examScreen" class="hidden">
-  <div id="topBar">
-    <div>Student: <span id="studentName"></span></div>
-    <div>Time Left: <span id="examTimer">20:00</span></div>
-    <div id="camera">Live Monitoring</div>
-  </div>
+<!-- TYPING TEST -->
+<div id="examScreen" class="hidden" style="padding:20px">
 
-  <div style="padding:20px">
-    <h2>Typing Test (Moderate Level)</h2>
+<h2>Typing Test (Moderate Level)</h2>
 
-    <div class="paraBox">
-      Technology has become an essential part of modern life. From communication
-      to education, digital tools help people work faster and smarter. The internet
-      allows instant access to information and connects individuals across the world.
-      However, responsible use of technology is important. Overdependence can reduce
-      productivity and affect health. Balancing digital usage with real life skills
-      leads to long term success and personal growth.
-    </div>
-
-    <textarea id="typingBox" rows="8"
-      placeholder="Start typing the above paragraph here..."></textarea>
-  </div>
+<div class="paraBox">
+Technology has become an essential part of modern life. From communication to
+education, digital tools help people work faster and smarter. The internet allows
+instant access to information and connects individuals across the world. However,
+responsible use of technology is important. Overdependence can reduce productivity
+and affect health. Balancing digital usage with real life skills leads to long term
+success and personal growth.
 </div>
 
-<!-- SUBMIT SCREEN (UNCHANGED) -->
-<div id="submitScreen" class="center hidden">
-  <h2>Submit Your Test</h2>
-  <button id="submitBtn">Submit</button>
+<textarea rows="8" placeholder="Type the above paragraph here..."></textarea>
+
 </div>
 
-<!-- HISTORY SCREEN (UNCHANGED) -->
-<div id="historyScreen" class="center hidden">
-  <h2>Check Exam History</h2>
-  <input id="pin" placeholder="Enter Secret PIN">
-  <button id="historyBtn">Check</button>
-  <pre id="historyData"></pre>
+<!-- FLOATING INFO -->
+<div id="floatingInfo" class="hidden">
+  <div>
+    <div id="studentName"></div>
+    <div>Time: <span id="examTimer">20:00</span></div>
+  </div>
+  <div id="camera">LIVE</div>
 </div>
 
 <script>
-  const loginBtn = document.getElementById("loginBtn");
-  const loginScreen = document.getElementById("loginScreen");
-  const countdownScreen = document.getElementById("countdownScreen");
-  const examScreen = document.getElementById("examScreen");
-  const countdownTimer = document.getElementById("countdownTimer");
-  const studentName = document.getElementById("studentName");
-  const examTimer = document.getElementById("examTimer");
+let student = "";
 
-  loginBtn.onclick = () => {
-    const name = document.getElementById("username").value;
-    if(!name) return alert("Enter username");
-    studentName.innerText = name;
-    loginScreen.classList.add("hidden");
-    countdownScreen.classList.remove("hidden");
-    startCountdown(120);
-  };
+function login(){
+  student = document.getElementById("username").value;
+  if(!student) return alert("Enter username");
 
-  function startCountdown(sec){
-    let t = sec;
-    const i = setInterval(()=>{
-      countdownTimer.innerText =
-        String(Math.floor(t/60)).padStart(2,"0")+":"+
-        String(t%60).padStart(2,"0");
-      if(t--<=0){
-        clearInterval(i);
-        countdownScreen.classList.add("hidden");
-        examScreen.classList.remove("hidden");
-        startExamTimer(20*60);
-      }
-    },1000);
-  }
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("countdownScreen").classList.remove("hidden");
 
-  function startExamTimer(sec){
-    let t = sec;
-    const i = setInterval(()=>{
-      examTimer.innerText =
-        String(Math.floor(t/60)).padStart(2,"0")+":"+
-        String(t%60).padStart(2,"0");
-      if(t--<=0){
-        clearInterval(i);
-        examScreen.classList.add("hidden");
-        document.getElementById("submitScreen").classList.remove("hidden");
-      }
-    },1000);
-  }
+  startCountdown(120);
+}
+
+function startCountdown(sec){
+  let t = sec;
+  let cd = document.getElementById("countdown");
+
+  let i = setInterval(()=>{
+    cd.innerText =
+      String(Math.floor(t/60)).padStart(2,"0") + ":" +
+      String(t%60).padStart(2,"0");
+
+    if(t-- <= 0){
+      clearInterval(i);
+      document.getElementById("countdownScreen").classList.add("hidden");
+      startExam();
+    }
+  },1000);
+}
+
+function startExam(){
+  document.getElementById("examScreen").classList.remove("hidden");
+  document.getElementById("floatingInfo").classList.remove("hidden");
+  document.getElementById("studentName").innerText = student;
+  startExamTimer(20*60);
+}
+
+function startExamTimer(sec){
+  let t = sec;
+  let et = document.getElementById("examTimer");
+
+  let i = setInterval(()=>{
+    et.innerText =
+      String(Math.floor(t/60)).padStart(2,"0") + ":" +
+      String(t%60).padStart(2,"0");
+
+    if(t-- <= 0){
+      clearInterval(i);
+      alert("Time up! Test submitted.");
+    }
+  },1000);
+}
 </script>
 
 </body>
