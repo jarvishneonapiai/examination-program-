@@ -2,33 +2,70 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Typing Test – Jarvishneonopenai</title>
+<title>Secure Typing Test</title>
 
 <style>
+/* ===== BASE ===== */
+*{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Arial;
+  font-family:Arial, sans-serif;
   background:black;
   color:#0ff;
+  overflow:hidden;
 }
-.hidden{display:none}
-.center{
+
+/* ===== HACKING BACKGROUND ===== */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0,255,255,0.08) 0px,
+      rgba(0,255,255,0.08) 1px,
+      transparent 2px,
+      transparent 6px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,0,0.08) 0px,
+      rgba(255,255,0,0.08) 1px,
+      transparent 2px,
+      transparent 10px
+    );
+  animation:scan 6s linear infinite;
+  pointer-events:none;
+}
+
+@keyframes scan{
+  from{background-position:0 0,0 0}
+  to{background-position:0 400px,0 800px}
+}
+
+/* ===== SCREENS ===== */
+.screen{
+  position:fixed;
+  inset:0;
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
   flex-direction:column;
-  text-align:center;
+  background:rgba(0,0,0,0.85);
 }
+.hidden{display:none}
+
+/* ===== UI ===== */
+h1{font-size:38px;text-shadow:0 0 15px cyan}
 input,button,textarea{
   padding:10px;
   margin:8px;
-  border-radius:5px;
   border:none;
+  border-radius:5px;
 }
 button{
   background:#0ff;
-  color:black;
   font-weight:bold;
   cursor:pointer;
 }
@@ -36,32 +73,32 @@ textarea{
   width:90%;
   max-width:900px;
 }
+
+/* ===== EXAM ===== */
 .paraBox{
   border:1px solid cyan;
   padding:15px;
   margin-bottom:15px;
 }
 
-/* bottom floating bar */
+/* ===== FLOATING INFO ===== */
 #floatingInfo{
   position:fixed;
-  bottom:10px;
-  right:10px;
+  bottom:15px;
+  right:15px;
   display:flex;
+  gap:12px;
   align-items:center;
-  gap:10px;
   font-size:14px;
 }
-
-/* camera circle */
 #camera{
   width:60px;
   height:60px;
   border:2px solid cyan;
   border-radius:50%;
   display:flex;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
   font-size:10px;
 }
 </style>
@@ -70,7 +107,7 @@ textarea{
 <body>
 
 <!-- LOGIN -->
-<div id="loginScreen" class="center">
+<div id="loginScreen" class="screen">
   <h1>Jarvishneonopenai</h1>
   <h3>Basic Web Development Programme</h3>
   <input id="username" placeholder="Username">
@@ -78,8 +115,8 @@ textarea{
   <button onclick="login()">Login</button>
 </div>
 
-<!-- COUNTDOWN ONLY -->
-<div id="countdownScreen" class="center hidden">
+<!-- COUNTDOWN -->
+<div id="countdownScreen" class="screen hidden">
   <h2>Your exam will start in</h2>
   <h1 id="countdown">02:00</h1>
 
@@ -94,22 +131,20 @@ textarea{
   </p>
 </div>
 
-<!-- TYPING TEST -->
-<div id="examScreen" class="hidden" style="padding:20px">
+<!-- EXAM -->
+<div id="examScreen" class="screen hidden">
+  <h2>Typing Test (Moderate Level)</h2>
 
-<h2>Typing Test (Moderate Level)</h2>
-
-<div class="paraBox">
+  <div class="paraBox">
 Technology has become an essential part of modern life. From communication to
 education, digital tools help people work faster and smarter. The internet allows
 instant access to information and connects individuals across the world. However,
 responsible use of technology is important. Overdependence can reduce productivity
 and affect health. Balancing digital usage with real life skills leads to long term
 success and personal growth.
-</div>
+  </div>
 
-<textarea rows="8" placeholder="Type the above paragraph here..."></textarea>
-
+  <textarea rows="8" placeholder="Type the above paragraph here..."></textarea>
 </div>
 
 <!-- FLOATING INFO -->
@@ -122,52 +157,54 @@ success and personal growth.
 </div>
 
 <script>
-let student = "";
+let student="";
 
 function login(){
-  student = document.getElementById("username").value;
+  student=document.getElementById("username").value;
   if(!student) return alert("Enter username");
 
-  document.getElementById("loginScreen").classList.add("hidden");
-  document.getElementById("countdownScreen").classList.remove("hidden");
-
+  showScreen("countdownScreen");
   startCountdown(120);
 }
 
-function startCountdown(sec){
-  let t = sec;
-  let cd = document.getElementById("countdown");
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+}
 
-  let i = setInterval(()=>{
-    cd.innerText =
-      String(Math.floor(t/60)).padStart(2,"0") + ":" +
+function startCountdown(sec){
+  let t=sec;
+  let cd=document.getElementById("countdown");
+
+  let i=setInterval(()=>{
+    cd.innerText=
+      String(Math.floor(t/60)).padStart(2,"0")+":"+
       String(t%60).padStart(2,"0");
 
-    if(t-- <= 0){
+    if(t--<=0){
       clearInterval(i);
-      document.getElementById("countdownScreen").classList.add("hidden");
       startExam();
     }
   },1000);
 }
 
 function startExam(){
-  document.getElementById("examScreen").classList.remove("hidden");
+  showScreen("examScreen");
   document.getElementById("floatingInfo").classList.remove("hidden");
-  document.getElementById("studentName").innerText = student;
+  document.getElementById("studentName").innerText=student;
   startExamTimer(20*60);
 }
 
 function startExamTimer(sec){
-  let t = sec;
-  let et = document.getElementById("examTimer");
+  let t=sec;
+  let et=document.getElementById("examTimer");
 
-  let i = setInterval(()=>{
-    et.innerText =
-      String(Math.floor(t/60)).padStart(2,"0") + ":" +
+  let i=setInterval(()=>{
+    et.innerText=
+      String(Math.floor(t/60)).padStart(2,"0")+":"+
       String(t%60).padStart(2,"0");
 
-    if(t-- <= 0){
+    if(t--<=0){
       clearInterval(i);
       alert("Time up! Test submitted.");
     }
